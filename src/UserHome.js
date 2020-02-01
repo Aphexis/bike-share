@@ -5,6 +5,7 @@ import {Button} from 'react-bootstrap';
 import {Map, GoogleApiWrapper, Marker, Polygon} from 'google-maps-react';
 import {Component} from 'react';
 import logoMarker from './assets/bike-marker.png';
+import html from 'react-inner-html';
 
 const mapStyles = {
   width: '100%',
@@ -17,6 +18,7 @@ export class MapContainer extends Component {
     super(props);
 
     this.state = {
+      buttonText: 'Lock',
       stores:[{lat: 55.00045659754565, lng: 10},
       {latitude: 55.00044782415184, longitude: 10.000087724470847},
       {latitude: 55.000421841127014, longitude: 10.000172077739476},
@@ -65,7 +67,7 @@ export class MapContainer extends Component {
  }
 
  displayArea = () => {
-   // this has to loop and close on itself
+   // this has to loop and close on itself and change this funtion to take in the list
    const triangleCoords = [
      [{lat: 25.774, lng: -80.190},
      {lat: 18.466, lng: -66.118},
@@ -84,6 +86,18 @@ export class MapContainer extends Component {
    }
  }
 
+ changeLock = (contents) => {
+   if (this.state.buttonText == 'Lock') {
+      this.setState({
+        buttonText:'Unlock'
+      })
+    } else {
+      this.setState({
+        buttonText:'Lock'
+      })
+    }
+ }
+
   render() {
     return (
       <div>
@@ -97,32 +111,12 @@ export class MapContainer extends Component {
           {this.displayArea()}
         </Map>
         <div className="lock-btn-cont">
-          <Button id="lock-btn" variant="success"><b>Lock</b></Button>
+          <Button id="lock-btn" variant="success" onClick={this.changeLock}><b>{this.state.buttonText}</b></Button>
         </div>
       </div>
     );
   }
 
-  // render() {
-  //   return (
-  //     <div>
-  //       <div>
-  //         <Map
-  //           google={this.props.google}
-  //           zoom={14}
-  //           style={mapStyles}
-  //           initialCenter={{
-  //            lat: 43.472222,
-  //            lng: -80.544722
-  //          }} >
-  //          {this.displayMarkers()}
-  //          // <Marker position={{lat: 43.472222, lng: -80.544722}} />
-  //         </Map>
-  //       </div>
-  //
-  //     </div>
-  //   );
-  // }
 }
 
 export default GoogleApiWrapper({
