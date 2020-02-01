@@ -63,14 +63,5 @@ function Login() {
   );
 }
 
-//function UserHome() {
-  //return (
-    //<div className="default">
-      //<div className="centered-btn">
-        //<Button id="my-btn" variant="success"><Link className="route-links" to="/">Lock</Link></Button>
-      //</div>
-    // </div>
-  // );
-// }
 
 export default App;
