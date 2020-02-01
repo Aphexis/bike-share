@@ -8,64 +8,11 @@ function App() {
   var longitude = 50;
   var userLocation;
   var bikeGeofence;
-  var bike_id = "testing";
+  var bike_id = "test";
   var userEvents;
   var userId = "ElleHacks";
   
   // var bike_id; // get from database
-  
-  useEffect(() => {
-    Radar.initialize("prj_live_pk_47e77da5365a55ff13b52e251c00b8e310e79770");
-    Radar.setUserId(userId);
-
-    // set user location
-    Radar.trackOnce(function(status, location, user, events) {
-      console.log(status);
-      console.log(location);
-      userLocation = location;
-      latitude = location.latitude;
-      longitude = location.longitude;
-    });
-    // get geofence matching bike_id
-    console.log("getting bike geofence");
-    var bikeHeaders = new Headers();
-    bikeHeaders.append(
-      "Authorization",
-      "prj_live_sk_d56b166e6c662999e3bd92574257b4d79cf30cb7"
-    );
-
-    var requestOptions = {
-      method: "GET",
-      headers: bikeHeaders,
-      redirect: "follow"
-    };
-
-    fetch(
-      "https://api.radar.io/v1/geofences/bike/".concat(bike_id),
-      requestOptions
-    )
-      .then(response => response.text())
-      .then(result => (bikeGeofence = result))
-      .catch(error => console.log("error", error));
-    
-    // get user events
-    var eventHeaders = new Headers();
-    eventHeaders.append(
-      "Authorization",
-      "prj_live_sk_d56b166e6c662999e3bd92574257b4d79cf30cb7"
-    );
-
-    var requestOptions = {
-      method: "GET",
-      headers: eventHeaders,
-      redirect: "follow"
-    };
-
-    fetch("https://api.radar.io/v1/events", requestOptions)
-      .then(response => response.text())
-      .then(result => userEvents = result)
-      .catch(error => console.log("error", error));
-  });
 
   function getLocation() {
     const mapLink = document.querySelector("#map-link");
@@ -110,7 +57,7 @@ function App() {
       .catch(error => console.log("error", error));
   };
 
-  async function getBike(bike_id) {
+  async function getBike(bike_id) { //get bike geofence
     console.log("making a request");
     var myHeaders = new Headers();
     myHeaders.append(
@@ -124,13 +71,11 @@ function App() {
       redirect: "follow"
     };
 
-    await fetch(
-      "https://api.radar.io/v1/geofences/bike/".concat(bike_id),
-      requestOptions
-    )
-      .then(response => response.text())
-      .then(result => (bikeGeofence = result))
-      .catch(error => console.log("error", error));
+    let result = await fetch("https://api.radar.io/v1/geofences/bike/".concat(bike_id), requestOptions)
+      // .then(response => response.text())
+      // .then(result => (bikeGeofence = result))
+      // .catch(error => console.log("error", error));
+    return result.text();
   }
 
   async function getEvents() {
@@ -154,11 +99,48 @@ function App() {
   }
 
   async function canUnlock() {
+    const mapLink = document.querySelector("#map-link");
+    // bikeGeofence = await getBike(bike_id);
+    // console.log(bikeGeofence);
     // check if user is in the geofence
     // if most recent event is entered geofence where geofence id = bike id, then can unlock
     // otherwise, can't unlock
-    let recent_event = await getEvents();
-    console.log(recent_event);
+    let events_request = await getEvents();
+    const obj = JSON.parse(events_request).events;
+    // console.log(userId)
+    let inFence = false;
+    console.log("before for")
+    for (var i = 0; i < obj.length; i++) {
+      if ((obj[i].user.userId == userId) && (obj[i].geofence.description == bike_id)) {
+        if (obj[i].type == "user.entered_geofence") {
+          console.log("true");
+          inFence = true;
+        } else {
+          break;        
+        }
+      }
+    }
+      if (inFence) {
+        mapLink.textContent = `You unlocked the bike!`;
+      } else {
+        mapLink.textContent = `You cannot unlock the bike!`;
+      }
+    // obj.forEach(item => {
+    //   // console.log(item)
+    //   if ((item.user.userId == userId) && (item.geofence.description == bike_id)) {
+    //     if (item.type == "user.entered_geofence") {
+    //       console.log("true");
+    //       inFence = true;
+    //   } else {
+    //     break;        
+    //   }
+    // });
+    // if (inFence) {
+    //   mapLink.textContent = `You unlocked the bike!`;
+    // } else {
+    //   mapLink.textContent = `You cannot unlock the bike!`;
+    // }
+ 
     // look for most recent event with .user.userId == userId 
     //   and geofence.description == bike_id
     // if .type == user.entered_geofence -> return true
