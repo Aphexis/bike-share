@@ -8,17 +8,17 @@ import {
   Route,
   Link,
 } from "react-router-dom";
+import MapContainer from './UserHome.js';
 
-export default function App() {
+function App() {
   return (
     <Router>
-
         <Switch>
           <Route path="/login">
             <Login />
           </Route>
           <Route path="/userhome">
-            <UserHome />
+            <MapContainer />
           </Route>
           <Route path="/">
             <Home />
@@ -63,14 +63,14 @@ function Login() {
   );
 }
 
-function UserHome() {
-  return (
-    <div className="default">
-      <div className="map">
-      </div>
-      <div className="centered-btn">
-        <Button id="my-btn" variant="success"><Link className="route-links" to="/">Lock</Link></Button>
-      </div>
-    </div>
-  );
-}
+//function UserHome() {
+  //return (
+    //<div className="default">
+      //<div className="centered-btn">
+        //<Button id="my-btn" variant="success"><Link className="route-links" to="/">Lock</Link></Button>
+      //</div>
+    // </div>
+  // );
+// }
+
+export default App;

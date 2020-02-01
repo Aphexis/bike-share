@@ -47,3 +47,16 @@
   display: flex;
   justify-content: center;
 }
+#lock-btn {
+  background-color: rgb(20, 200, 100);
+  z-index: 3;
+  position: absolute;
+  bottom: 0;
+  width: 20%;
+  margin-left: 40%;
+  margin-right: 40%;
+  margin-bottom: 5vh;
+
+}
+#lock-btn-cont {
+}
