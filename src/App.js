@@ -1,16 +1,23 @@
 import React from 'react';
 import './App.css';
 import logo from './assets/bike-logo.png';
-//import 'bootstrap/dist/css/bootstrap.min.css';
+import {Button} from 'react-bootstrap';
 
 function App() {
   return (
-    <body>
-      <div className="App">
+    <div className="home">
         <h1 id="logo-title">Bike Share</h1>
         <img id="logo" src={logo} alt={"logo"} />
+      <div className="centered-btn">
+        <Button id="my-btn" variant="success">Log In</Button>
       </div>
-    </body>
+    </div>
+
+    <div className="login">
+
+    </div>
+
+
   );
 }
 

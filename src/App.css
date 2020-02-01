@@ -1,13 +1,27 @@
-body {
+.home {
   background-color: rgb(220, 220, 220);
-  text-align: center;
   font-family: raleway;
+  display: block;
+  height: 100vh;
 }
 #logo-title {
+  padding-top: 5vh;
+  text-align: center;
   font-size: 10vh;
   color: rgb(20, 200, 100);
 }
 #logo {
+  display: block;
   width: 50vh;
   height: auto;
+  margin-right: auto;
+  margin-left: auto;
+}
+.centered-btn {
+  display: flex;
+  justify-content: center;
+}
+#my-btn {
+  margin-top: 5vh;
+  background-color: rgb(20, 200, 100);
 }
