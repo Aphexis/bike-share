@@ -13,6 +13,7 @@ void draw() {
     myPort.write('1');
     println("1");
   } else {
+    println("0");
     myPort.write('0');  
   }
 }
