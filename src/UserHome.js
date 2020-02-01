@@ -6,6 +6,32 @@ import {Map, GoogleApiWrapper, Marker, Polygon} from 'google-maps-react';
 import {Component} from 'react';
 import logoMarker from './assets/bike-marker.png';
 import html from 'react-inner-html';
+import Radar from "radar-sdk-js";
+
+var latitude = 1;
+var longitude = 5;
+var userLocation;
+var bike_id = "test";
+var userId = "ElleHacks";
+
+  // var bike_id; // get from database
+
+function getLocation(cb) {
+const mapLink = document.querySelector("#map-link");
+return Radar.trackOnce(function(status, location, user, events) {
+  console.log(status);
+  console.log(location);
+  console.log(location.latitude);
+  // userLocation = location;
+  // latitude = location.latitude;
+  // longitude = location.longitude;
+  // mapLink.textContent = location; - display - add marker
+  console.log({lat: location.latitude, lng: location.longitude});
+  cb(location);
+  //return new Promise {lat: location.latitude, lng: location.longitude});
+  // mapLink.textContent = `Latitude: ${latitude} °, Longitude: ${longitude} °`;
+});
+  }
 
 const mapStyles = {
   width: '100%',
@@ -14,57 +40,30 @@ const mapStyles = {
 
 export class MapContainer extends Component {
 
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      buttonText: 'Lock',
-      stores:[{lat: 55.00045659754565, lng: 10},
-      {latitude: 55.00044782415184, longitude: 10.000087724470847},
-      {latitude: 55.000421841127014, longitude: 10.000172077739476},
-      {latitude: 55.00037964698426, longitude: 10.00024981815708},
-      {latitude: 55.0003228632208, longitude: 10.000317958203006},
-      {latitude: 55.00025367200483, longitude: 10.000373879293504},
-      {latitude: 55.000174732315976, longitude: 10.000415432412426},
-      {latitude: 55.00008907776221, longitude: 10.000441020696718},
-      {latitude: 55, longitude: 10.000449660802959},
-      {latitude: 54.99991092223779, longitude: 10.000441020696718},
-      {latitude: 54.999825267684024, longitude: 10.000415432412426},
-      {latitude: 54.99974632799517, longitude: 10.000373879293504},
-      {latitude: 54.9996771367792, longitude: 10.000317958203006},
-      {latitude: 54.99962035301574, longitude: 10.00024981815708},
-      {latitude: 54.999578158872986, longitude: 10.000172077739476},
-      {latitude: 54.99955217584816, longitude: 10.000087724470847},
-      {latitude: 54.99954340245435, longitude: 10},
-      {latitude: 54.99955217584816, longitude: 9.999912275529153},
-      {latitude: 54.999578158872986, longitude: 9.999827922260524},
-      {latitude: 54.99962035301574, longitude: 9.99975018184292},
-      {latitude: 54.9996771367792, longitude: 9.999682041796994},
-      {latitude: 54.99974632799517, longitude: 9.999626120706496},
-      {latitude: 54.999825267684024, longitude: 9.999584567587574},
-      {latitude: 54.99991092223779, longitude: 9.999558979303282},
-      {latitude: 55, longitude: 9.999550339197041},
-      {latitude: 55.00008907776221, longitude: 9.999558979303282},
-      {latitude: 55.000174732315976, longitude: 9.999584567587574},
-      {latitude: 55.00025367200483, longitude: 9.999626120706496},
-      {latitude: 55.0003228632208, longitude: 9.999682041796994},
-      {latitude: 55.00037964698426, longitude: 9.99975018184292},
-      {latitude: 55.000421841127014, longitude: 9.999827922260524},
-      {latitude: 55.00044782415184, longitude: 9.999912275529153},
-      {latitude: 55.00045659754565, longitude: 10}]
-    }
+  state = {
+    isLocked: true,
+    loading: false,
+    latitude: undefined,
+    longitude: undefined,
   }
 
+  componentDidMount() {
+    this.getLocation();
+  }
 
-  displayMarkers = () => {
-    return this.state.stores.map((store, index) => {
-      return <Marker key={index} id={index} position={{ // icon={logoMarker}
-       lat: store.latitude,
-       lng: store.longitude
-     }}
-     onClick={() => console.log("")} />
-   })
- }
+  getLocation = () => {
+    this.setState({ loading: true });
+    Radar.trackOnce((status, location = {}) => {
+      console.log(status, location);
+      if (status === Radar.STATUS.SUCCESS) {
+        this.setState({
+          loading: false,
+          latitude: location.latitude,
+          longitude: location.longitude,
+        });
+      }
+    })
+  }
 
  displayArea = () => {
    // this has to loop and close on itself and change this funtion to take in the list
@@ -86,16 +85,27 @@ export class MapContainer extends Component {
    }
  }
 
- changeLock = (contents) => {
-   if (this.state.buttonText == 'Lock') {
-      this.setState({
-        buttonText:'Unlock'
-      })
-    } else {
-      this.setState({
-        buttonText:'Lock'
-      })
-    }
+ renderMarker = () => {
+   if (this.state.latitude) {
+     return (
+       <Marker position={{
+         lat: this.state.latitude,
+         lng: this.state.longitude
+       }} />
+     );
+   }
+   return null;
+ }
+
+ onAction = (contents) => {
+
+   if (this.state.isLocked) {
+     this.getLocation();
+   }
+
+   this.setState({
+     isLocked: !this.state.isLocked,
+   });
  }
 
   render() {
@@ -107,11 +117,12 @@ export class MapContainer extends Component {
           style={mapStyles}
           initialCenter={{ lat: 47.444, lng: -122.176}}
         >
-          {this.displayMarkers()}
-          {this.displayArea()}
+          {this.renderMarker()}
         </Map>
         <div className="lock-btn-cont">
-          <Button id="lock-btn" variant="success" onClick={this.changeLock}><b>{this.state.buttonText}</b></Button>
+          <Button id="lock-btn" variant="success" onClick={this.onAction}>
+            { this.state.isLocked ? 'Unlock' : 'Lock' }
+          </Button>
         </div>
       </div>
     );

@@ -1,4 +1,5 @@
 import React from 'react';
+import Radar from "radar-sdk-js";
 import './App.css';
 import logo from './assets/bike-logo.png';
 import {Button} from 'react-bootstrap';
@@ -9,6 +10,9 @@ import {
   Link,
 } from "react-router-dom";
 import MapContainer from './UserHome.js';
+
+Radar.initialize('prj_live_pk_47e77da5365a55ff13b52e251c00b8e310e79770');
+Radar.setUserId('ElleHacks');
 
 function App() {
   return (
