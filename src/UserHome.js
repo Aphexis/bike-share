@@ -11,7 +11,7 @@ import Radar from "radar-sdk-js";
 // var latitude = 1;
 // var longitude = 5;
 // var userLocation;
-var bike_id = "test";//"5198900662";
+var bike_id = "5198900662";
 var userId = "rgillan";
 
 function getLocation(cb) {
@@ -139,11 +139,11 @@ async function getBike(bike_id) { //get bike geofence
     }
       if (inFence) {
         // mapLink.textContent = `You unlocked the bike!`;
-        alert("You've unlocked the bike!");
+        // alert("You've unlocked the bike!");
         return true;
       } else {
         //mapLink.textContent = `You cannot unlock the bike!`;
-        alert("You cannot unlock the bike!");
+        // alert("You cannot unlock the bike!");
         return false;
       }
 }
@@ -248,10 +248,11 @@ export class MapContainer extends Component {
    let unlock = await canUnlock()
    if (this.state.isLocked) {
      if (!unlock) {
-      //  alert('NOPE');
+       alert('You are too far away to unlock the bike!');
        let result = await fetch("http://40b9210c.ngrok.io/lock");
        return;
      } else {
+      alert('You unlocked the bike!');
       this.setState({
         isLocked: !this.state.isLocked,
         points: [],
@@ -259,6 +260,7 @@ export class MapContainer extends Component {
       let result = await fetch("http://40b9210c.ngrok.io/unlock");
     }
    } else {
+     alert("You locked your bike!")
      await this.getPoints();
      this.setState({
        isLocked: !this.state.isLocked,
