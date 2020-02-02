@@ -1,20 +1,25 @@
 import React from 'react';
 import './App.css';
 import logo from './assets/bike-logo.png';
-import {Button} from 'react-bootstrap';
+import info from './assets/info.png';
+import network from './assets/network.png';
+import location from './assets/location.png';
+import followers from './assets/followers.png';
+import share from './assets/share.png';
+import {Button, Modal} from 'react-bootstrap';
 import {Map, GoogleApiWrapper, Marker, Polygon} from 'google-maps-react';
 import {Component} from 'react';
 import logoMarker from './assets/bike.png';
 import html from 'react-inner-html';
 import Radar from "radar-sdk-js";
+import { useState } from 'react';
+import Popup from 'reactjs-popup'
 
-var latitude = 1;
-var longitude = 5;
-var userLocation;
+// var latitude = 1;
+// var longitude = 5;
+// var userLocation;
 var bike_id = "5198900662";
 var userId = "rgillan";
-
-  // var bike_id; // get from database
 
 function getLocation(cb) {
   const mapLink = document.querySelector("#map-link");
@@ -57,10 +62,11 @@ const createGeofence = async (long, lat) => {
     redirect: "follow"
   };
 
-  fetch("https://api.radar.io/v1/geofences", requestOptions)
-    .then(response => response.text())
-    .then(result => console.log(result))
-    .catch(error => console.log("error", error));
+  let result = await fetch("https://api.radar.io/v1/geofences", requestOptions)
+  return result;
+    // .then(response => response.text())
+    // .then(result => console.log(result))
+    // .catch(error => console.log("error", error));
 };
 
 const doRadar = (url, props) => {
@@ -92,7 +98,7 @@ async function getBike(bike_id) { //get bike geofence
       // .then(result => (bikeGeofence = result))
       // .catch(error => console.log("error", error));
 
-    console.log(result);
+    // console.log(result);
     return result.text();
   }
 
@@ -125,7 +131,7 @@ async function getBike(bike_id) { //get bike geofence
     // otherwise, can't unlock
     let events_request = await getEvents();
     const obj = JSON.parse(events_request).events;
-    console.log(events_request);
+    // console.log(events_request);
     // console.log(userId)
     let inFence = false;
     console.log("before for")
@@ -141,30 +147,14 @@ async function getBike(bike_id) { //get bike geofence
     }
       if (inFence) {
         // mapLink.textContent = `You unlocked the bike!`;
-        alert("You've unlocked the bike!");
+        // alert("You've unlocked the bike!");
         return true;
       } else {
         //mapLink.textContent = `You cannot unlock the bike!`;
-        alert("You cannot unlock the bike!");
+        // alert("You cannot unlock the bike!");
+        // alert("You are not close enough to the bike to unlock it!");
         return false;
       }
-
-  return (
-    <div className="App">
-      <button id="find-me" onClick={getLocation}>
-        Show my location
-      </button>
-      <button id="make-geofence" onClick={createGeofence}>
-        Make a geofence
-      </button>
-      <button id="unlock" onClick={canUnlock}>
-        Unlock bike
-      </button>
-      <br />
-      <p id="status"></p>
-      <a id="map-link" target="_blank"></a>
-    </div>
-  );
 }
 
 async function geofenceParser() {
@@ -198,6 +188,7 @@ export class MapContainer extends Component {
   }
 
   componentDidMount() {
+    Radar.initialize("prj_live_pk_47e77da5365a55ff13b52e251c00b8e310e79770");
     Radar.setUserId(userId);
     Promise.all([
       this.getLocation(),
@@ -208,6 +199,7 @@ export class MapContainer extends Component {
         this.getLocation();
       }, 10000);
     });
+    let result = fetch("https://40b9210c.ngrok.io/lock");
   }
 
   componentWillUnmount() {
@@ -260,40 +252,93 @@ export class MapContainer extends Component {
  }
 
  onAction = async (contents) => {
+   console.log("on action");
+   await this.getLocation();
+   let unlock = await canUnlock()
    if (this.state.isLocked) {
-     if (!canUnlock()) {
-       alert('NOPE');
+     if (!unlock) {
+       alert('You are too far away to unlock the bike!');
+       let result = await fetch("https://40b9210c.ngrok.io/lock");
        return;
-     }
-     this.setState({
-       isLocked: !this.state.isLocked,
-       points: [],
-     });
+     } else {
+      alert('You unlocked the bike!');
+      this.setState({
+        isLocked: !this.state.isLocked,
+        points: [],
+      });
+      let result = await fetch("https://40b9210c.ngrok.io/unlock");
+    }
    } else {
+     alert("You locked your bike!")
+     bike_id = bike_id.concat("1");
+     console.log(this.state.marker);
+     createGeofence(this.state.marker.lng, this.state.marker.lat);
      await this.getPoints();
      this.setState({
        isLocked: !this.state.isLocked,
      });
+     let result = await fetch("https://40b9210c.ngrok.io/lock");
    }
  }
 
   render() {
     return !this.state.loading && (
       <div>
+        <nav className="navbar navbar-light bg-light">
+          <img id="nav-logo" src={logo} />
+          <a className="navbar-brand">BicyEco</a>
+        </nav>
         <Map
           google={this.props.google}
           zoom={18}
           style={mapStyles}
           initialCenter={this.state.marker}
+          disableDefaultUI='true'
         >
           {this.renderMarker()}
           {this.renderFence()}
         </Map>
-        <div className="lock-btn-cont">
+          <div className="lock-btn-cont">
           <Button id="lock-btn" variant="success" onClick={this.onAction}>
             { this.state.isLocked ? 'Unlock' : 'Lock' }
           </Button>
         </div>
+        <div id="icon-col">
+          <Popup trigger={<Button className="icon" variant="light"><img className="icon-pic" src={info} /></Button>} position="left center">
+            <div>
+              <h6>User Information</h6>
+              <hr />
+              <p>Username: ElleHacks</p>
+              <p>Email: info@ellehacks.ca</p>
+            </div>
+          </Popup>
+          <Popup trigger={<Button className="icon" variant="light"><img className="icon-pic" src={network} /></Button>} position="left center">
+            <div>
+              <h6>Current Bike Owners: </h6>
+              <ul>
+                <li>Wen Zhang</li>
+                <li>Stephanie Xu</li>
+                <li>Evelyn Li</li>
+                <li>Rahma Gillan</li>
+              </ul>
+            </div>
+          </Popup>
+          <Popup trigger={<Button className="icon" variant="light"><img className="icon-pic" src={location} /></Button>} position="left center">
+            <div>
+              <p>Public Bike ID = 100 </p>
+              <p>Lock Status = {this.state.isLocked.toString()}</p>
+            </div>
+          </Popup>
+          <Popup trigger={<Button className="icon" variant="light"><img className="icon-pic" src={followers} /></Button>} position="left center">
+            <div>
+              <p>Bike User Limit = 5/10</p>
+            </div>
+          </Popup>
+          <a target="_blank" href="https://github.com/Aphexis/bike-share"><Button className="icon" variant="light"><img className="icon-pic" src={share} /></Button></a>
+
+        </div>
+
+
       </div>
     );
   }
@@ -302,4 +347,5 @@ export class MapContainer extends Component {
 
 export default GoogleApiWrapper({
   apiKey: 'AIzaSyAjuuYihkBjfoZKhjfK9Rwavf5mhrIlULc'
+
 })(MapContainer);
