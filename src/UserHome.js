@@ -199,7 +199,7 @@ export class MapContainer extends Component {
         this.getLocation();
       }, 10000);
     });
-    let result = fetch("https://40b9210c.ngrok.io/lock");
+    let result = fetch("https://57668d2e.ngrok.io/lock");
   }
 
   componentWillUnmount() {
@@ -258,7 +258,7 @@ export class MapContainer extends Component {
    if (this.state.isLocked) {
      if (!unlock) {
        alert('You are too far away to unlock the bike!');
-       let result = await fetch("https://40b9210c.ngrok.io/lock");
+       let result = await fetch("https://57668d2e.ngrok.io/lock");
        return;
      } else {
       alert('You unlocked the bike!');
@@ -266,7 +266,7 @@ export class MapContainer extends Component {
         isLocked: !this.state.isLocked,
         points: [],
       });
-      let result = await fetch("https://40b9210c.ngrok.io/unlock");
+      let result = await fetch("https://57668d2e.ngrok.io/unlock");
     }
    } else {
      alert("You locked your bike!")
@@ -282,7 +282,7 @@ export class MapContainer extends Component {
      this.setState({
        isLocked: !this.state.isLocked,
      });
-     let result = await fetch("https://40b9210c.ngrok.io/lock");
+     let result = await fetch("https://57668d2e.ngrok.io/lock");
    }
  }
 
