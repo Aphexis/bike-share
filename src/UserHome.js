@@ -1,12 +1,18 @@
 import React from 'react';
 import './App.css';
 import logo from './assets/bike-logo.png';
-import {Button} from 'react-bootstrap';
+import info from './assets/info.png';
+import network from './assets/network.png';
+import location from './assets/location.png';
+import followers from './assets/followers.png';
+import share from './assets/share.png';
+import {Button, Modal} from 'react-bootstrap';
 import {Map, GoogleApiWrapper, Marker, Polygon} from 'google-maps-react';
 import {Component} from 'react';
 import logoMarker from './assets/bike.png';
 import html from 'react-inner-html';
 import Radar from "radar-sdk-js";
+import { useState } from 'react';
 
 // var latitude = 1;
 // var longitude = 5;
@@ -143,7 +149,7 @@ async function getBike(bike_id) { //get bike geofence
         return true;
       } else {
         //mapLink.textContent = `You cannot unlock the bike!`;
-        alert("You cannot unlock the bike!");
+        alert("You are not close enough to the bike to unlock it!");
         return false;
       }
 }
@@ -248,7 +254,6 @@ export class MapContainer extends Component {
    let unlock = await canUnlock()
    if (this.state.isLocked) {
      if (!unlock) {
-      //  alert('NOPE');
        let result = await fetch("http://40b9210c.ngrok.io/lock");
        return;
      } else {
@@ -270,20 +275,33 @@ export class MapContainer extends Component {
   render() {
     return !this.state.loading && (
       <div>
+        <nav className="navbar navbar-light bg-light">
+          <img id="nav-logo" src={logo} />
+          <a className="navbar-brand">BicyEco</a>
+        </nav>
         <Map
           google={this.props.google}
           zoom={18}
           style={mapStyles}
           initialCenter={this.state.marker}
+          disableDefaultUI='true'
         >
           {this.renderMarker()}
           {this.renderFence()}
         </Map>
-        <div className="lock-btn-cont">
+          <div className="lock-btn-cont">
           <Button id="lock-btn" variant="success" onClick={this.onAction}>
             { this.state.isLocked ? 'Unlock' : 'Lock' }
           </Button>
         </div>
+        <div id="icon-col">
+          <Button className="icon" variant="light"><img className="icon-pic" src={info} /></Button>
+          <Button className="icon" variant="light"><img className="icon-pic" src={network} /></Button>
+          <Button className="icon" variant="light"><img className="icon-pic" src={location} /></Button>
+          <Button className="icon" variant="light"><img className="icon-pic" src={followers} /></Button>
+          <Button className="icon" variant="light"><img className="icon-pic" src={share} /></Button>
+        </div>
+
       </div>
     );
   }
