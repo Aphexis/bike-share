@@ -204,14 +204,14 @@ export class MapContainer extends Component {
       this.getPoints(),
     ]).then(() => {
       this.setState({ loading: false });
-      this.timer = window.setInterval(() => {
-        this.getLocation();
-      }, 10000);
+      // this.timer = window.setInterval(() => {
+      //   this.getLocation();
+      // }, 10000);
     });
   }
 
   componentWillUnmount() {
-    window.clearInterval(this.timer);
+    // window.clearInterval(this.timer);
   }
 
   getLocation = () => {
