@@ -13,7 +13,6 @@ var longitude = 5;
 var userLocation;
 var bike_id = "5198900662";
 var userId = "rgillan";
-var canIunlock = false;
 
   // var bike_id; // get from database
 
@@ -63,6 +62,16 @@ const createGeofence = async (long, lat) => {
     .then(result => console.log(result))
     .catch(error => console.log("error", error));
 };
+
+const doRadar = (url, props) => {
+  return fetch('https://api.radar.io/v1' + url, {
+    headers: {
+      'Authorization': 'prj_live_sk_d56b166e6c662999e3bd92574257b4d79cf30cb7',
+    },
+    redirect: 'follow',
+    ...props,
+  });
+}
 
 async function getBike(bike_id) { //get bike geofence
     console.log("making a request");
@@ -133,11 +142,11 @@ async function getBike(bike_id) { //get bike geofence
       if (inFence) {
         // mapLink.textContent = `You unlocked the bike!`;
         alert("You've unlocked the bike!");
-        canIunlock = true;
+        return true;
       } else {
         //mapLink.textContent = `You cannot unlock the bike!`;
         alert("You cannot unlock the bike!");
-        canIunlock = false;
+        return false;
       }
 
   return (
@@ -163,12 +172,12 @@ async function geofenceParser() {
     const obj = JSON.parse(geofence);
     let coords = obj.geofence.geometry.coordinates;
     coords = coords[0];
-    console.log(coords);
     let formatted_coords = [];
     for (let i = 0; i < coords.length; i++) {
       formatted_coords.push({lat: coords[i][1], lng: coords[i][0]});
     }
-    return formatted_coords;
+    console.log(formatted_coords);
+    return await formatted_coords;
   }
 
 const mapStyles = {
@@ -180,99 +189,96 @@ export class MapContainer extends Component {
 
   state = {
     isLocked: true,
-    loading: false,
-    latitude: undefined,
-    longitude: undefined,
+    loading: true,
+    marker: {
+      lat: undefined,
+      lng: undefined,
+    },
+    points: [],
   }
 
   componentDidMount() {
     Radar.setUserId(userId);
-    this.getLocation();
+    Promise.all([
+      this.getLocation(),
+      this.getPoints(),
+    ]).then(() => {
+      this.setState({ loading: false });
+      this.timer = window.setInterval(() => {
+        this.getLocation();
+      }, 10000);
+    });
+  }
+
+  componentWillUnmount() {
+    window.clearInterval(this.timer);
   }
 
   getLocation = () => {
-    this.setState({ loading: true });
-    Radar.trackOnce((status, location = {}) => {
-      console.log(status, location);
-      if (status === Radar.STATUS.SUCCESS) {
-        this.setState({
-          loading: false,
-          latitude: location.latitude,
-          longitude: location.longitude,
-        });
-      }
-    })
+    return new Promise(resolve => {
+      Radar.trackOnce((status, location = {}) => {
+        console.log(status, location);
+        if (status === Radar.STATUS.SUCCESS) {
+          this.setState({
+            marker: {
+              lat: location.latitude,
+              lng: location.longitude,
+            }
+          });
+          resolve();
+        }
+      });
+    });
   }
 
- displayArea = () => {
-   // this has to loop and close on itself and change this funtion to take in the list
-   const triangleCoords = [
-     [{lat: 25.774, lng: -80.190},
-     {lat: 18.466, lng: -66.118},
-     {lat: 32.321, lng: -64.757},
-     {lat: 25.774, lng: -80.190}]
-   ];
-
-   for (var i = 0; i < triangleCoords.length; i++) {
-     return <Polygon
-       paths={triangleCoords}
-       strokeColor="#FFFFFF"
-       strokeOpacity={0.8}
-       strokeWeight={2}
-       fillColor="#FFFFFF"
-       fillOpacity={0.75} />
-   }
- }
+  getPoints = async () => {
+    const data = await doRadar('/geofences/bike/' + bike_id);
+    const json = await data.json();
+    this.setState({
+      points: json.geofence.geometry.coordinates[0]
+      .map(([ lng, lat ]) => ({ lat, lng })),
+    });
+  }
 
  renderMarker = () => {
-   if (this.state.latitude) {
-     return (
-       <Marker position={{
-         lat: this.state.latitude,
-         lng: this.state.longitude
-       }} />
-     );
-   }
-   return null;
- }
-
- renderFence = (coords) => {
-   console.log("AM I HERE");
    return (
-     <Polygon
-       paths={geofenceParser(coords)}
-       strokeColor="#FFFFFF"
-       strokeOpacity={0.8}
-       strokeWeight={2}
-       fillColor="#FFFFFF"
-       fillOpacity={0.75} />
+     <Marker position={this.state.marker} />
    );
  }
 
- onAction = (contents) => {
+ renderFence = () => {
+   return (
+     <Polygon
+       paths={this.state.points}
+       strokeColor="#14C865"
+       strokeOpacity={0.8}
+       strokeWeight={2}
+       fillColor="#14C865"
+       fillOpacity={0.75}
+     />
+   );
+ }
 
+ onAction = async (contents) => {
    if (this.state.isLocked) {
-     canUnlock();
-     this.getLocation();
-     // createGeofence(this.state.longitude, this.state.latitude);
-     var bike = getBike(bike_id); // process this boy
-     console.log("Chocolateu: " + bike);
-     //if (canIunlock) {
-       this.setState({
-         isLocked: !this.state.isLocked,
-       });
-       canIunlock = false;
-    // }
+     if (!canUnlock()) {
+       alert('NOPE');
+       return;
+     }
+     this.setState({
+       isLocked: !this.state.isLocked,
+       points: [],
+     });
    } else {
+     await this.getPoints();
      this.setState({
        isLocked: !this.state.isLocked,
      });
-     canIunlock = false;
    }
  }
 
   render() {
-    return (
+    return !this.state.loading && (
       <div>
         <Map
           google={this.props.google}
@@ -281,7 +287,7 @@ export class MapContainer extends Component {
           initialCenter={{ lat: 47.444, lng: -122.176}}
         >
           {this.renderMarker()}
-          {this.renderFence(geofenceParser())}
+          {this.renderFence()}
         </Map>
         <div className="lock-btn-cont">
           <Button id="lock-btn" variant="success" onClick={this.onAction}>
