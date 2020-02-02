@@ -1,48 +1,71 @@
-import React from "react";
-import logo from "./logo.svg";
-import "./App.css";
+import React from 'react';
+import Radar from "radar-sdk-js";
+import './App.css';
+import logo from './assets/bike-logo.png';
+import {Button} from 'react-bootstrap';
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Link,
+} from "react-router-dom";
+import MapContainer from './UserHome.js';
+
+Radar.initialize('prj_live_pk_47e77da5365a55ff13b52e251c00b8e310e79770');
+Radar.setUserId('ElleHacks');
 
 function App() {
   return (
-    <div className="App">
-      <button id="find-me" onClick="geoFindMe()">Show my location</button>
-      <br />
-      <p id="status"></p>
-      <a id="map-link" target="_blank"></a>
+    <Router>
+        <Switch>
+          <Route path="/login">
+            <Login />
+          </Route>
+          <Route path="/userhome">
+            <MapContainer />
+          </Route>
+          <Route path="/">
+            <Home />
+          </Route>
+        </Switch>
+
+    </Router>
+  );
+}
+
+function Home() {
+  return (
+    <div className="default">
+        <h1 id="logo-title">Bike Share</h1>
+        <img id="logo" src={logo} alt={"logo"} />
+        <div className="centered-btn">
+        <Button id="my-btn" variant="success"><Link className="route-links" to="/login">Log In</Link></Button>
+      </div>
     </div>
   );
 }
 
-function geoFindMe() {
-
-  const status = document.querySelector('#status');
-  const mapLink = document.querySelector('#map-link');
-
-  mapLink.href = '';
-  mapLink.textContent = '';
-
-  function success(position) {
-    const latitude  = position.coords.latitude;
-    const longitude = position.coords.longitude;
-
-    status.textContent = '';
-    mapLink.href = `https://www.openstreetmap.org/#map=18/${latitude}/${longitude}`;
-    mapLink.textContent = `Latitude: ${latitude} °, Longitude: ${longitude} °`;
-  }
-
-  function error() {
-    status.textContent = 'Unable to retrieve your location';
-  }
-
-  if (!navigator.geolocation) {
-    status.textContent = 'Geolocation is not supported by your browser';
-  } else {
-    status.textContent = 'Locating…';
-    navigator.geolocation.getCurrentPosition(success, error);
-  }
-
+function Login() {
+  return (
+    <div className="default">
+      <h1 id="logo-title">Bike Share</h1>
+      <img id="logo" src={logo} alt={"logo"} />
+      <div className="input-g">
+        <label for="username-input" className="login-field-label">Username</label>
+        <input id="username-input" className="login-field" type="text" placeholder="Enter Username" />
+      </div>
+      <div className="input-g-outer">
+        <div className="input-g">
+          <label for="password-input" className="login-field-label">Password</label>
+          <input id="password-input" className="login-field" type="password" placeholder="Enter Password" />
+        </div>
+        <div className="centered-btn">
+          <Button id="my-btn" variant="success"><Link className="route-links" to="/userhome">Log In</Link></Button>
+        </div>
+      </div>
+    </div>
+  );
 }
 
-// document.querySelector('#find-me').addEventListener('click', geoFindMe);
 
 export default App;

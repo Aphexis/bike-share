@@ -1,38 +1,62 @@
-.App {
+.default {
+  background-color: rgb(220, 220, 220);
+  font-family: raleway;
+  display: block;
+  height: 100vh;
+}
+#logo-title {
+  padding-top: 5vh;
   text-align: center;
+  font-size: 10vh;
+  color: rgb(20, 200, 100);
 }
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+#logo {
+  display: block;
+  width: 50vh;
+  height: auto;
+  margin-right: auto;
+  margin-left: auto;
 }
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.centered-btn {
   display: flex;
-  flex-direction: column;
-  align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
 }
-
-.App-link {
-  color: #61dafb;
+#my-btn {
+  margin-top: 5vh;
+  background-color: rgb(20, 200, 100);
 }
+.route-links {
+  text-decoration: none;
+  color: black;
+}
+.route-links:hover {
+    text-decoration: none;
+    color: rgb(220, 220, 220);
+}
+.login-field {
+  display: block;
+  padding: 1vh;
+}
+.login-field-label {
+  display: block;
+  margin-right: 2vh;
+  display: table-cell;
+}
+.input-g {
+  margin: 5vh;
+  display: flex;
+  justify-content: center;
+}
+#lock-btn {
+  background-color: rgb(20, 200, 100);
+  z-index: 3;
+  position: absolute;
+  bottom: 0;
+  width: 20%;
+  margin-left: 40%;
+  margin-right: 40%;
+  margin-bottom: 5vh;
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+}
+#lock-btn-cont {
 }
