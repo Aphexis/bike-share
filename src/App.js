@@ -78,7 +78,21 @@ function App() {
     return result.text();
   }
 
+  async function geofenceParser() {
+    let geofence = await getBike(bike_id);
+    const obj = JSON.parse(geofence);
+    let coords = obj.geofence.geometry.coordinates;
+    coords = coords[0];
+    console.log(coords);
+    let formatted_coords = [];
+    for (let i = 0; i < coords.length; i++) {
+      formatted_coords.push({lat: coords[i][1], lng: coords[i][0]});
+    }
+    return formatted_coords;
+  }
+
   async function getEvents() {
+    console.log("in events")
     var myHeaders = new Headers();
     myHeaders.append(
       "Authorization",
@@ -106,6 +120,7 @@ function App() {
     // if most recent event is entered geofence where geofence id = bike id, then can unlock
     // otherwise, can't unlock
     let events_request = await getEvents();
+    console.log(events_request);
     const obj = JSON.parse(events_request).events;
     // console.log(userId)
     let inFence = false;
@@ -157,6 +172,9 @@ function App() {
       </button>
       <button id="unlock" onClick={canUnlock}>
         Unlock bike
+      </button>
+      <button id="geofence" onClick={geofenceParser}>
+        See geofence
       </button>
       <br />
       <p id="status"></p>
