@@ -4,7 +4,7 @@ import logo from './assets/bike-logo.png';
 import {Button} from 'react-bootstrap';
 import {Map, GoogleApiWrapper, Marker, Polygon} from 'google-maps-react';
 import {Component} from 'react';
-import logoMarker from './assets/bike-marker.png';
+import logoMarker from './assets/bike.png';
 import html from 'react-inner-html';
 import Radar from "radar-sdk-js";
 
@@ -242,7 +242,7 @@ export class MapContainer extends Component {
 
  renderMarker = () => {
    return (
-     <Marker position={this.state.marker} />
+     <Marker icon={logoMarker} position={this.state.marker} />
    );
  }
 
@@ -282,9 +282,9 @@ export class MapContainer extends Component {
       <div>
         <Map
           google={this.props.google}
-          zoom={8}
+          zoom={18}
           style={mapStyles}
-          initialCenter={{ lat: 47.444, lng: -122.176}}
+          initialCenter={this.state.marker}
         >
           {this.renderMarker()}
           {this.renderFence()}
