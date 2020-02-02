@@ -61,10 +61,11 @@ const createGeofence = async (long, lat) => {
     redirect: "follow"
   };
 
-  fetch("https://api.radar.io/v1/geofences", requestOptions)
-    .then(response => response.text())
-    .then(result => console.log(result))
-    .catch(error => console.log("error", error));
+  let result = await fetch("https://api.radar.io/v1/geofences", requestOptions)
+  return result;
+    // .then(response => response.text())
+    // .then(result => console.log(result))
+    // .catch(error => console.log("error", error));
 };
 
 const doRadar = (url, props) => {
@@ -193,15 +194,15 @@ export class MapContainer extends Component {
       this.getPoints(),
     ]).then(() => {
       this.setState({ loading: false });
-      // this.timer = window.setInterval(() => {
-      //   this.getLocation();
-      // }, 10000);
+      this.timer = window.setInterval(() => {
+        this.getLocation();
+      }, 10000);
     });
-    let result = fetch("http://40b9210c.ngrok.io/lock");
+    let result = fetch("https://40b9210c.ngrok.io/lock");
   }
 
   componentWillUnmount() {
-    // window.clearInterval(this.timer);
+    window.clearInterval(this.timer);
   }
 
   getLocation = () => {
@@ -256,7 +257,7 @@ export class MapContainer extends Component {
    if (this.state.isLocked) {
      if (!unlock) {
        alert('You are too far away to unlock the bike!');
-       let result = await fetch("http://40b9210c.ngrok.io/lock");
+       let result = await fetch("https://40b9210c.ngrok.io/lock");
        return;
      } else {
       alert('You unlocked the bike!');
@@ -264,15 +265,18 @@ export class MapContainer extends Component {
         isLocked: !this.state.isLocked,
         points: [],
       });
-      let result = await fetch("http://40b9210c.ngrok.io/unlock");
+      let result = await fetch("https://40b9210c.ngrok.io/unlock");
     }
    } else {
      alert("You locked your bike!")
+     bike_id = bike_id.concat("1");
+     console.log(this.state.marker);
+     createGeofence(this.state.marker.lng, this.state.marker.lat);
      await this.getPoints();
      this.setState({
        isLocked: !this.state.isLocked,
      });
-     let result = await fetch("http://40b9210c.ngrok.io/lock");
+     let result = await fetch("https://40b9210c.ngrok.io/lock");
    }
  }
 
