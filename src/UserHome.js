@@ -13,6 +13,7 @@ import logoMarker from './assets/bike.png';
 import html from 'react-inner-html';
 import Radar from "radar-sdk-js";
 import { useState } from 'react';
+import Popup from 'reactjs-popup'
 
 // var latitude = 1;
 // var longitude = 5;
@@ -303,12 +304,40 @@ export class MapContainer extends Component {
           </Button>
         </div>
         <div id="icon-col">
-          <Button className="icon" variant="light"><img className="icon-pic" src={info} /></Button>
-          <Button className="icon" variant="light"><img className="icon-pic" src={network} /></Button>
-          <Button className="icon" variant="light"><img className="icon-pic" src={location} /></Button>
-          <Button className="icon" variant="light"><img className="icon-pic" src={followers} /></Button>
-          <Button className="icon" variant="light"><img className="icon-pic" src={share} /></Button>
+          <Popup trigger={<Button className="icon" variant="light"><img className="icon-pic" src={info} /></Button>} position="left center">
+            <div>
+              <h6>User Information</h6>
+              <hr />
+              <p>Username: ElleHacks</p>
+              <p>Email: info@ellehacks.ca</p>
+            </div>
+          </Popup>
+          <Popup trigger={<Button className="icon" variant="light"><img className="icon-pic" src={network} /></Button>} position="left center">
+            <div>
+              <h6>Current Bike Owners: </h6>
+              <ul>
+                <li>Wen Zhang</li>
+                <li>Stephanie Xu</li>
+                <li>Evelyn Li</li>
+                <li>Rahma Gillan</li>
+              </ul>
+            </div>
+          </Popup>
+          <Popup trigger={<Button className="icon" variant="light"><img className="icon-pic" src={location} /></Button>} position="left center">
+            <div>
+              <p>Public Bike ID = 100 </p>
+              <p>Lock Status = {this.state.isLocked.toString()}</p>
+            </div>
+          </Popup>
+          <Popup trigger={<Button className="icon" variant="light"><img className="icon-pic" src={followers} /></Button>} position="left center">
+            <div>
+              <p>Bike User Limit = 5/10</p>
+            </div>
+          </Popup>
+          <a target="_blank" href="https://github.com/Aphexis/bike-share"><Button className="icon" variant="light"><img className="icon-pic" src={share} /></Button></a>
+
         </div>
+
 
       </div>
     );
@@ -318,4 +347,5 @@ export class MapContainer extends Component {
 
 export default GoogleApiWrapper({
   apiKey: 'AIzaSyAjuuYihkBjfoZKhjfK9Rwavf5mhrIlULc'
+
 })(MapContainer);
