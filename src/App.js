@@ -36,7 +36,7 @@ function App() {
 function Home() {
   return (
     <div className="default">
-        <h1 id="logo-title">Bike Share</h1>
+        <h1 id="logo-title">BicyEco</h1>
         <img id="logo" src={logo} alt={"logo"} />
         <div className="centered-btn">
         <Button id="my-btn" variant="success"><Link className="route-links" to="/login">Log In</Link></Button>
@@ -48,7 +48,7 @@ function Home() {
 function Login() {
   return (
     <div className="default">
-      <h1 id="logo-title">Bike Share</h1>
+      <h1 id="logo-title">BicyEco</h1>
       <img id="logo" src={logo} alt={"logo"} />
       <div className="input-g">
         <label for="username-input" className="login-field-label">Username</label>
