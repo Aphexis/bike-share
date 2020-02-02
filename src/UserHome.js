@@ -8,13 +8,11 @@ import logoMarker from './assets/bike.png';
 import html from 'react-inner-html';
 import Radar from "radar-sdk-js";
 
-var latitude = 1;
-var longitude = 5;
-var userLocation;
-var bike_id = "5198900662";
+// var latitude = 1;
+// var longitude = 5;
+// var userLocation;
+var bike_id = "test";//"5198900662";
 var userId = "rgillan";
-
-  // var bike_id; // get from database
 
 function getLocation(cb) {
   const mapLink = document.querySelector("#map-link");
@@ -92,7 +90,7 @@ async function getBike(bike_id) { //get bike geofence
       // .then(result => (bikeGeofence = result))
       // .catch(error => console.log("error", error));
 
-    console.log(result);
+    // console.log(result);
     return result.text();
   }
 
@@ -125,7 +123,7 @@ async function getBike(bike_id) { //get bike geofence
     // otherwise, can't unlock
     let events_request = await getEvents();
     const obj = JSON.parse(events_request).events;
-    console.log(events_request);
+    // console.log(events_request);
     // console.log(userId)
     let inFence = false;
     console.log("before for")
@@ -148,23 +146,6 @@ async function getBike(bike_id) { //get bike geofence
         alert("You cannot unlock the bike!");
         return false;
       }
-
-  return (
-    <div className="App">
-      <button id="find-me" onClick={getLocation}>
-        Show my location
-      </button>
-      <button id="make-geofence" onClick={createGeofence}>
-        Make a geofence
-      </button>
-      <button id="unlock" onClick={canUnlock}>
-        Unlock bike
-      </button>
-      <br />
-      <p id="status"></p>
-      <a id="map-link" target="_blank"></a>
-    </div>
-  );
 }
 
 async function geofenceParser() {
@@ -198,6 +179,7 @@ export class MapContainer extends Component {
   }
 
   componentDidMount() {
+    Radar.initialize("prj_live_pk_47e77da5365a55ff13b52e251c00b8e310e79770");
     Radar.setUserId(userId);
     Promise.all([
       this.getLocation(),
@@ -208,6 +190,7 @@ export class MapContainer extends Component {
       //   this.getLocation();
       // }, 10000);
     });
+    let result = fetch("http://40b9210c.ngrok.io/lock");
   }
 
   componentWillUnmount() {
@@ -260,20 +243,27 @@ export class MapContainer extends Component {
  }
 
  onAction = async (contents) => {
+   console.log("on action");
+   await this.getLocation();
+   let unlock = await canUnlock()
    if (this.state.isLocked) {
-     if (!canUnlock()) {
-       alert('NOPE');
+     if (!unlock) {
+      //  alert('NOPE');
+       let result = await fetch("http://40b9210c.ngrok.io/lock");
        return;
-     }
-     this.setState({
-       isLocked: !this.state.isLocked,
-       points: [],
-     });
+     } else {
+      this.setState({
+        isLocked: !this.state.isLocked,
+        points: [],
+      });
+      let result = await fetch("http://40b9210c.ngrok.io/unlock");
+    }
    } else {
      await this.getPoints();
      this.setState({
        isLocked: !this.state.isLocked,
      });
+     let result = await fetch("http://40b9210c.ngrok.io/lock");
    }
  }
 
