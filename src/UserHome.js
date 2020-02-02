@@ -270,9 +270,14 @@ export class MapContainer extends Component {
     }
    } else {
      alert("You locked your bike!")
-     bike_id = bike_id.concat("1");
+     // bike_id = bike_id.concat("1");
      console.log(this.state.marker);
-     createGeofence(this.state.marker.lng, this.state.marker.lat);
+     // console.log(getBike("111111"));
+     // while (getBike(bike_id)) {
+     //   bike_id = bike_id.concat("1");
+     // }
+     // bike_id = bike_id.concat("1");
+     // createGeofence(this.state.marker.lng, this.state.marker.lat);
      await this.getPoints();
      this.setState({
        isLocked: !this.state.isLocked,
